@@ -695,7 +695,7 @@ function renderTimeline() {
           <div class="timeline-date">${displayDate}</div>
           <div class="timeline-info">
             <div class="timeline-couple">${wedding.couple}</div>
-            <div class="timeline-venue">${wedding.venue} · ${wedding.city}</div>
+            <a class="timeline-venue" href="https://maps.apple.com/?q=${encodeURIComponent(wedding.address || wedding.venue)}" style="text-decoration:none;color:inherit;" target="_blank">${wedding.venue} · ${wedding.city} ↗</a>
           </div>
         </div>
       `;
@@ -1207,7 +1207,16 @@ function openCouplePanel(coupleName) {
   // ── State Summary ──
   if (d.stateLines && d.stateLines.length > 0) {
     html += `<div class="cp-section"><div class="cp-section-title">Current State</div><div class="cp-card">`;
-    d.stateLines.forEach(s => { html += `<div style="font-size:0.8rem;padding:3px 0;line-height:1.5">${escHtml(s)}</div>`; });
+    d.stateLines.forEach(s => {
+      const venueMatch = s.match(/^Venue:\s*(.+)$/);
+      if (venueMatch) {
+        const addr = venueMatch[1].trim();
+        const mapsUrl = 'https://maps.apple.com/?q=' + encodeURIComponent(addr);
+        html += `<div style="font-size:0.8rem;padding:3px 0;line-height:1.5">Venue: <a href="${mapsUrl}" style="color:var(--accent);text-decoration:underline;" target="_blank">${escHtml(addr)}</a> <span style="font-size:0.7rem;color:var(--text-dim)">↗</span></div>`;
+      } else {
+        html += `<div style="font-size:0.8rem;padding:3px 0;line-height:1.5">${escHtml(s)}</div>`;
+      }
+    });
     html += `</div></div>`;
   }
 
